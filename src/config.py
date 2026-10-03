@@ -26,11 +26,11 @@ R2_PUBLIC_BASE = os.environ.get("R2_PUBLIC_BASE", "").rstrip("/")
 BRAND = os.environ.get("BRAND", "ChukChum")
 
 OLLAMA_API_KEY = os.environ.get("OLLAMA_API_KEY", "")
-OLLAMA_API = os.environ.get("OLLAMA_API", "https://ollama.com")
-OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "gemma4:31b")
+OLLAMA_API = os.environ.get("OLLAMA_API") or "https://ollama.com"
+OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL") or "gemma4:31b"
 
-MEDIA_REPO_DIR = os.environ.get("MEDIA_REPO_DIR", str(ROOT.parent / "chukchum-media"))
-MEDIA_REPO = os.environ.get("MEDIA_REPO", "JackPro2121/chukchum-media")
+MEDIA_REPO_DIR = os.environ.get("MEDIA_REPO_DIR") or str(ROOT.parent / "chukchum-media")
+MEDIA_REPO = os.environ.get("MEDIA_REPO") or "JackPro2121/chukchum-media"
 ENABLED_SERVICES = [s.strip() for s in os.environ.get("ENABLED_SERVICES", "").split(",") if s.strip()]
 
 YOUTUBE_ACTOR = "streamers~youtube-scraper"

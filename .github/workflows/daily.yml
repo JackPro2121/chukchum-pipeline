@@ -46,7 +46,7 @@ jobs:
         env:
           APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
           OLLAMA_API_KEY: ${{ secrets.OLLAMA_API_KEY }}
-          OLLAMA_MODEL: ${{ vars.OLLAMA_MODEL }}
+          OLLAMA_MODEL: gemma4:31b
         run: python src/fetch_targets.py
 
       - name: Enhance, host and queue to Buffer

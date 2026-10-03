@@ -6,3 +6,7 @@ data/enhanced/
 data/state.db-journal
 data/state.db-wal
 data/state.db-shm
+
+_tmp*.py
+src/data/
+
