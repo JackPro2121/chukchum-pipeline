@@ -1,37 +1,65 @@
-name: Daily Pipeline
+name: ChukChum Auto Publish
 
 on:
   schedule:
-    - cron: "0 */6 * * *"
+    - cron: "25 */6 * * *"
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
-  run:
+  publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout pipeline
+        uses: actions/checkout@v4
+
+      - name: Checkout media repo
+        uses: actions/checkout@v4
+        with:
+          repository: JackPro2121/chukchum-media
+          path: media-repo
+          token: ${{ secrets.MEDIA_REPO_TOKEN }}
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+
       - name: Install ffmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
-      - name: Install deps
+
+      - name: Install dependencies
         run: pip install -r requirements.txt
-      - name: Run pipeline
+
+      - name: Configure git identity
+        run: |
+          git config --global user.email "bot@chukchum.local"
+          git config --global user.name "ChukChum Bot"
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config --global --add safe.directory "$GITHUB_WORKSPACE/media-repo"
+
+      - name: Export media repo path
+        run: echo "MEDIA_REPO_DIR=$GITHUB_WORKSPACE/media-repo" >> "$GITHUB_ENV"
+
+      - name: Select latest unposted reels
         env:
           APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
+          OLLAMA_API_KEY: ${{ secrets.OLLAMA_API_KEY }}
+          OLLAMA_MODEL: ${{ vars.OLLAMA_MODEL }}
+        run: python src/fetch_targets.py
+
+      - name: Enhance, host and queue to Buffer
+        env:
           BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
-          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
-          R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
-          R2_SECRET_KEY: ${{ secrets.R2_SECRET_KEY }}
-          R2_BUCKET: ${{ secrets.R2_BUCKET }}
-          R2_PUBLIC_BASE: ${{ secrets.R2_PUBLIC_BASE }}
-          BRAND: ChukChum
-        run: python src/pipeline.py 2
-      - name: Commit state db
+          ENABLED_SERVICES: facebook
+          MEDIA_REPO: JackPro2121/chukchum-media
+        run: python src/pipeline_v2.py
+
+      - name: Commit state
         run: |
-          git config user.email "ci@chukchum.local"
-          git config user.name "chukchum-ci"
-          git add data/state.db data/creators.csv || true
-          git commit -m "state update [skip ci]" || true
-          git push
+          git config user.email "bot@chukchum.local"
+          git config user.name "ChukChum Bot"
+          git add data/state.db data/targets.csv || true
+          git diff --staged --quiet || git commit -m "state: update processed sources"
+          git push || true

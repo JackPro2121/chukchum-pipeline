@@ -25,7 +25,18 @@ def list_channels() -> list[dict]:
     return channels
 
 
-def create_video_post(channel_id: str, text: str, video_url: str, mode: str = "addToQueue") -> dict:
+def create_video_post(channel_id: str, text: str, video_url: str, service: str, mode: str = "addToQueue") -> dict:
+    service_l = service.lower()
+    if service_l == "facebook":
+        metadata = 'metadata: {facebook: {type: reel}}'
+    elif service_l == "instagram":
+        metadata = 'metadata: {instagram: {type: reel}}'
+    elif service_l == "tiktok":
+        metadata = 'metadata: {tiktok: {type: "video"}}'
+    elif service_l == "youtube":
+        metadata = 'metadata: {youtube: {type: "shorts"}}'
+    else:
+        metadata = ''
     q = f"""
     mutation {{
       createPost(input: {{
@@ -34,6 +45,7 @@ def create_video_post(channel_id: str, text: str, video_url: str, mode: str = "a
         schedulingType: automatic
         mode: {mode}
         assets: [{{ video: {{ url: "{video_url}" }} }}]
+        {metadata}
       }}) {{
         ... on PostActionSuccess {{ post {{ id text }} }}
         ... on MutationError {{ message }}
@@ -41,12 +53,15 @@ def create_video_post(channel_id: str, text: str, video_url: str, mode: str = "a
     }}
     """
     data = _gql(q)
-    return data["createPost"]
+    res = data["createPost"]
+    if "message" in res:
+        raise RuntimeError(res["message"])
+    return res
 
 
 def post_to_service(service: str, text: str, video_url: str) -> str:
     for ch in list_channels():
         if ch["service"].lower() == service.lower():
-            res = create_video_post(ch["id"], text, video_url)
+            res = create_video_post(ch["id"], text, video_url, ch["service"])
             return f"{ch['name']}: {res}"
     return f"No channel for {service}"

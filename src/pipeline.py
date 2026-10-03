@@ -1,5 +1,12 @@
 import csv
 import sys
+
+if hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 from config import CREATORS_CSV
 from creators_state import eligible_creators, missing_platforms
 
@@ -38,11 +45,15 @@ def run(max_creators: int = 2, videos_per_creator: int = 1):
         for service in services:
             try:
                 res = buffer_client.post_to_service(service, video_caption(c), public_url)
-                print("  post:", res)
                 posted.append(service)
+                try:
+                    print("  post:", res)
+                except UnicodeError:
+                    print("  post: success (caption contains non-ascii emoji)")
             except Exception as e:
-                print(f"  {service} ERROR: {e}")
-        storage.record_video(c["channel_url"], source, enhanced, public_url, posted, caption=video_caption(c))
+                print(f"  {service} ERROR: {str(e)[:200]}")
+        status = "done" if posted else "error"
+        storage.record_video(c["channel_url"], source, enhanced, public_url, posted, status=status, caption=video_caption(c))
 
 
 def video_caption(c: dict) -> str:

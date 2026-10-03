@@ -26,6 +26,13 @@ CREATE TABLE IF NOT EXISTS processed_videos (
   status TEXT,
   created_at TEXT
 );
+CREATE TABLE IF NOT EXISTS processed_sources (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  video_source_url TEXT UNIQUE,
+  status TEXT,
+  caption TEXT,
+  processed_at TEXT
+);
 """
 
 
@@ -40,6 +47,10 @@ def init():
         conn.executescript(SCHEMA)
         try:
             conn.execute("ALTER TABLE processed_videos ADD COLUMN caption TEXT")
+        except sqlite3.OperationalError:
+            pass
+        try:
+            conn.execute("ALTER TABLE processed_sources ADD COLUMN caption TEXT")
         except sqlite3.OperationalError:
             pass
 

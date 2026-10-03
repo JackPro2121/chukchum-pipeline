@@ -3,12 +3,13 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 ROOT = Path(__file__).resolve().parent.parent
-load_dotenv(ROOT / ".env")
+load_dotenv(ROOT / ".env", override=True)
 
 APIFY_TOKEN = os.environ.get("APIFY_TOKEN", "")
 BUFFER_API_KEY = os.environ.get("BUFFER_API_KEY", "")
 
 CREATORS_CSV = str(ROOT / os.environ.get("CREATORS_CSV", "data/creators.csv"))
+TARGETS_CSV = str(ROOT / os.environ.get("TARGETS_CSV", "data/targets.csv"))
 DB_PATH = str(ROOT / os.environ.get("DB_PATH", "data/state.db"))
 DOWNLOAD_DIR = str(ROOT / os.environ.get("DOWNLOAD_DIR", "data/downloads"))
 ENHANCED_DIR = str(ROOT / os.environ.get("ENHANCED_DIR", "data/enhanced"))
@@ -23,6 +24,10 @@ R2_BUCKET = os.environ.get("R2_BUCKET", "")
 R2_PUBLIC_BASE = os.environ.get("R2_PUBLIC_BASE", "").rstrip("/")
 
 BRAND = os.environ.get("BRAND", "ChukChum")
+
+OLLAMA_API_KEY = os.environ.get("OLLAMA_API_KEY", "")
+OLLAMA_API = os.environ.get("OLLAMA_API", "https://ollama.com")
+OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "gemma4:31b")
 
 MEDIA_REPO_DIR = os.environ.get("MEDIA_REPO_DIR", str(ROOT.parent / "chukchum-media"))
 MEDIA_REPO = os.environ.get("MEDIA_REPO", "JackPro2121/chukchum-media")

@@ -1,10 +1,12 @@
 import sys
 sys.path.insert(0, ".")
-import buffer_client as b
+import requests
+from config import BUFFER_API_KEY, BUFFER_API
 
-def fields(name):
-    r = b._gql(f'query {{ __type(name:"{name}") {{ fields {{ name }} }} }}')["__type"]
-    return [f["name"] for f in r["fields"]] if r and r.get("fields") else r
-
-print("Post:", fields("Post"))
-print("Assets:", fields("Assets"))
+r = requests.post(
+    BUFFER_API,
+    headers={"Content-Type": "application/json", "Authorization": f"Bearer {BUFFER_API_KEY}"},
+    json={"query": "query GetOrganizations { account { organizations { id name } } }"},
+    timeout=60,
+)
+print(r.json())

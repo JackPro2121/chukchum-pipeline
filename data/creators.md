@@ -15,15 +15,6 @@ Format: platform URLs, activity status (last post days ago), category/niche, tar
 - **Target upload niche:** funny/trending short videos
 - **Notes:** Content style: short comedy gags with Hindi captions. IG se download → TikTok/YouTube Shorts/FB.
 
-### archuyadav623
-- **Name:** Archu Yadav
-- **Category:** Relationship / romantic reels (Hindi), artist/influencer
-- **Instagram:** https://www.instagram.com/archuyadav623/ — 135k followers, 1622 posts, ACTIVE (daily posts, latest 3 Oct 2026)
-- **Facebook:** https://www.facebook.com/archuyadav623/ — present
-- **TikTok:** NOT FOUND → upload target
-- **YouTube:** NOT FOUND → upload target
-- **Notes:** Daily posting creator, relationship/care/shayari niche reels. IG + FB pe active, TikTok/YT pe absent.
-
 ### mvikashhu29_
 - **Name:** Vikaash Raathore
 - **Category:** Funny memes / reaction reels (Hindi), daily reels

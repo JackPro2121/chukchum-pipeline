@@ -1,7 +1,7 @@
 import subprocess
 import uuid
 from pathlib import Path
-from config import MEDIA_REPO_DIR
+from config import MEDIA_REPO_DIR, MEDIA_REPO
 
 
 def public_url_for(filename: str) -> str:
