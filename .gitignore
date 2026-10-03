@@ -1,0 +1,8 @@
+.env
+__pycache__/
+*.mp4
+data/downloads/
+data/enhanced/
+data/state.db-journal
+data/state.db-wal
+data/state.db-shm

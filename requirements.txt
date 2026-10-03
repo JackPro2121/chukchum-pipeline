@@ -1,0 +1,5 @@
+requests
+python-dotenv
+yt-dlp
+boto3
+apify-client
