@@ -34,6 +34,7 @@ MEDIA_REPO = os.environ.get("MEDIA_REPO") or "JackPro2121/chukchum-media"
 ENABLED_SERVICES = [s.strip() for s in os.environ.get("ENABLED_SERVICES", "").split(",") if s.strip()]
 MAX_QUEUE_PER_CHANNEL = int(os.environ.get("MAX_QUEUE_PER_CHANNEL", "8"))
 MAX_POSTS_PER_RUN = int(os.environ.get("MAX_POSTS_PER_RUN", "2"))
+FETCH_ONLY_IF_QUEUE_EMPTY = (os.environ.get("FETCH_ONLY_IF_QUEUE_EMPTY", "false") or "").lower() in ("1", "true", "yes")
 
 YOUTUBE_ACTOR = "streamers~youtube-scraper"
 GOOGLE_SEARCH_ACTOR = "apify~google-search-scraper"

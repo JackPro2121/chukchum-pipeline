@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   publish:
@@ -32,36 +32,29 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Configure git identity
+      - name: Configure git
         run: |
           git config --global user.email "bot@chukchum.local"
           git config --global user.name "ChukChum Bot"
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git config --global --add safe.directory "$GITHUB_WORKSPACE/media-repo"
+          echo "MEDIA_REPO_DIR=$GITHUB_WORKSPACE/media-repo" >> "$GITHUB_ENV"
 
-      - name: Export media repo path
-        run: echo "MEDIA_REPO_DIR=$GITHUB_WORKSPACE/media-repo" >> "$GITHUB_ENV"
-
-      - name: Select latest unposted reels
+      - name: Run daily pipeline (queue gate, fetch, publish)
         env:
           APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
           OLLAMA_API_KEY: ${{ secrets.OLLAMA_API_KEY }}
           OLLAMA_MODEL: gemma4:31b
-        run: python src/fetch_targets.py
-
-      - name: Enhance, host and queue to Buffer
-        env:
           BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
           ENABLED_SERVICES: facebook
           MAX_QUEUE_PER_CHANNEL: "8"
           MAX_POSTS_PER_RUN: "1"
+          FETCH_ONLY_IF_QUEUE_EMPTY: "true"
           MEDIA_REPO: JackPro2121/chukchum-media
-        run: python src/pipeline_v2.py
+        run: python src/run_daily.py
 
       - name: Commit state
         run: |
-          git config user.email "bot@chukchum.local"
-          git config user.name "ChukChum Bot"
           git add data/state.db data/targets.csv || true
-          git diff --staged --quiet || git commit -m "state: update processed sources"
+          git diff --staged --quiet || git commit -m "state: processed sources"
           git push || true

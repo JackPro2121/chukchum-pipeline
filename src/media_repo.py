@@ -8,6 +8,10 @@ def public_url_for(filename: str) -> str:
     return f"https://raw.githubusercontent.com/{MEDIA_REPO}/main/videos/{filename}"
 
 
+def _sync():
+    subprocess.run(["git", "pull", "--rebase", "--autostash"], cwd=MEDIA_REPO_DIR, check=True)
+
+
 def add(file_path: str) -> str:
     src = Path(file_path)
     dest_dir = Path(MEDIA_REPO_DIR) / "videos"
@@ -17,6 +21,7 @@ def add(file_path: str) -> str:
     dest.write_bytes(src.read_bytes())
     subprocess.run(["git", "add", f"videos/{name}"], cwd=MEDIA_REPO_DIR, check=True)
     subprocess.run(["git", "commit", "-m", f"add {name}"], cwd=MEDIA_REPO_DIR, check=True)
+    _sync()
     subprocess.run(["git", "push"], cwd=MEDIA_REPO_DIR, check=True)
     return public_url_for(name)
 
@@ -26,5 +31,6 @@ def remove(filename: str):
     if path.exists():
         subprocess.run(["git", "rm", f"videos/{filename}"], cwd=MEDIA_REPO_DIR, check=True)
         subprocess.run(["git", "commit", "-m", f"prune {filename}"], cwd=MEDIA_REPO_DIR, check=True)
+        _sync()
         subprocess.run(["git", "push"], cwd=MEDIA_REPO_DIR, check=True)
         path.unlink(missing_ok=True)
