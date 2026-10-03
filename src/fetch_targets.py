@@ -18,7 +18,6 @@ if hasattr(sys.stdout, "reconfigure"):
 TARGETS = [
     {"username": "classicboy2659", "category": "comedy"},
     {"username": "bade__chote_", "category": "comedy"},
-    {"username": "mvikashhu29_", "category": "comedy"},
 ]
 
 CATEGORIES = {

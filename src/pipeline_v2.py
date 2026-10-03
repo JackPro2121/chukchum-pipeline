@@ -7,7 +7,7 @@ if hasattr(sys.stdout, "reconfigure"):
     except Exception:
         pass
 
-from config import ENABLED_SERVICES, TARGETS_CSV
+from config import ENABLED_SERVICES, TARGETS_CSV, MAX_QUEUE_PER_CHANNEL, MAX_POSTS_PER_RUN
 import storage, enhancer, buffer_client, media_repo
 
 
@@ -16,10 +16,25 @@ def video_caption(row: dict) -> str:
 
 
 def run():
+    services = ENABLED_SERVICES or ["facebook"]
+    for service in services:
+        queued = buffer_client.scheduled_count(service)
+        print(f"{service}: {queued} scheduled in queue")
+        if queued >= MAX_QUEUE_PER_CHANNEL:
+            print(f"  queue guard: {queued}/{MAX_QUEUE_PER_CHANNEL}, skipping {service} this run")
+
     with open(TARGETS_CSV, newline="", encoding="utf-8") as f:
         rows = list(csv.DictReader(f))
     print(f"rows: {len(rows)}")
+    posted_this_run = 0
     for r in rows:
+        if posted_this_run >= MAX_POSTS_PER_RUN:
+            print(f">>> {r['username']}: per-run cap reached ({MAX_POSTS_PER_RUN}), deferred")
+            continue
+        blocked = [s for s in services if buffer_client.scheduled_count(s) >= MAX_QUEUE_PER_CHANNEL]
+        if blocked:
+            print(f">>> {r['username']}: skipped, queue full on {blocked}")
+            continue
         print(f">>> {r['username']} :: {r['category']}")
         if storage.already_processed(r["reel_url"]):
             print("  already posted, skip")
@@ -33,7 +48,6 @@ def run():
             storage.record_video(r["reel_url"], r["reel_url"], enhanced, "", [], status="failed-host", caption=video_caption(r))
             continue
         posted = []
-        services = ENABLED_SERVICES or ["facebook"]
         for service in services:
             try:
                 res = buffer_client.post_to_service(service, video_caption(r), public_url)
@@ -46,6 +60,8 @@ def run():
                 print(f"  {service} ERROR: {str(e)[:200]}")
         status = "done" if posted else "error"
         storage.record_video(r["reel_url"], r["reel_url"], enhanced, public_url, posted, status=status, caption=video_caption(r))
+        if posted:
+            posted_this_run += 1
 
 
 if __name__ == "__main__":

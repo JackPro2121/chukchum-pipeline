@@ -55,9 +55,23 @@ python cleanup_media.py   # prune media older than 10 days (only if posts are se
 Targets live in `src/fetch_targets.py` (`TARGETS`). Dedup state lives in
 `data/state.db` (`processed_videos`), so a reel is never queued twice.
 
+## Queue safety
+
+Buffer free plan allows a limited number of scheduled posts per channel, and a brand-new
+Facebook page should not suddenly publish a burst of content. Two guards are enforced in
+`pipeline_v2.py`:
+
+| Guard | Default | Meaning |
+|---|---|---|
+| `MAX_QUEUE_PER_CHANNEL` | `8` | skip posting if the channel already has this many scheduled/sending posts |
+| `MAX_POSTS_PER_RUN` | `2` | cap how many posts a single run may create |
+
+Schedule is once per day (`20 6 * * *`) with `MAX_POSTS_PER_RUN=1`, so a fresh page ramps up
+at ~1 reel/day instead of 3.
+
 ## GitHub Actions
 
-`.github/workflows/daily.yml` runs every 6 hours (and on manual dispatch):
+`.github/workflows/daily.yml` runs daily at 06:20 UTC and on manual dispatch:
 
 1. checks out the pipeline and `JackPro2121/chukchum-media`
 2. installs ffmpeg + deps

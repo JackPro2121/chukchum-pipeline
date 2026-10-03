@@ -15,16 +15,6 @@ Format: platform URLs, activity status (last post days ago), category/niche, tar
 - **Target upload niche:** funny/trending short videos
 - **Notes:** Content style: short comedy gags with Hindi captions. IG se download → TikTok/YouTube Shorts/FB.
 
-### mvikashhu29_
-- **Name:** Vikaash Raathore
-- **Category:** Funny memes / reaction reels (Hindi), daily reels
-- **Instagram:** https://www.instagram.com/mvikashhu29_/ — 6.6k followers, 85 posts, ACTIVE (latest ~1 Oct 2026)
-- **TikTok:** NOT FOUND → upload target
-- **YouTube:** bio mein YouTube link claim, direct match search mein nahi mila → verify manually
-- **Facebook:** no official page → upload target
-- **Top post:** ~355k likes reel
-- **Notes:** Small but active creator. Bio: "Content Creator, New Reels Every Day".
-
 ### chaklo_memes (already everywhere — skip)
 - **Instagram:** https://www.instagram.com/chaklo_memes/ — 48.5k followers, 131 posts, active daily
 - **TikTok:** exists (@chaklo_memes0 / @chaklo.memes)

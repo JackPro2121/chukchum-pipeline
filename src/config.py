@@ -32,6 +32,8 @@ OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL") or "gemma4:31b"
 MEDIA_REPO_DIR = os.environ.get("MEDIA_REPO_DIR") or str(ROOT.parent / "chukchum-media")
 MEDIA_REPO = os.environ.get("MEDIA_REPO") or "JackPro2121/chukchum-media"
 ENABLED_SERVICES = [s.strip() for s in os.environ.get("ENABLED_SERVICES", "").split(",") if s.strip()]
+MAX_QUEUE_PER_CHANNEL = int(os.environ.get("MAX_QUEUE_PER_CHANNEL", "8"))
+MAX_POSTS_PER_RUN = int(os.environ.get("MAX_POSTS_PER_RUN", "2"))
 
 YOUTUBE_ACTOR = "streamers~youtube-scraper"
 GOOGLE_SEARCH_ACTOR = "apify~google-search-scraper"

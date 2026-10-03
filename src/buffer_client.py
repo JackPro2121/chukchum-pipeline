@@ -59,6 +59,22 @@ def create_video_post(channel_id: str, text: str, video_url: str, service: str, 
     return res
 
 
+def scheduled_count(service: str | None = None) -> int:
+    total = 0
+    for org in _gql("query { account { organizations { id } } }")["account"]["organizations"]:
+        data = _gql(
+            'query { posts(first: 50, input: { organizationId: "'
+            + org["id"]
+            + '", filter: { status: [scheduled, sending] } }) { edges { node { id status channel { service } } } } }'
+        )
+        for edge in (data.get("posts") or {}).get("edges", []):
+            node = edge["node"]
+            if service and (node.get("channel", {}).get("service") or "").lower() != service.lower():
+                continue
+            total += 1
+    return total
+
+
 def post_to_service(service: str, text: str, video_url: str) -> str:
     for ch in list_channels():
         if ch["service"].lower() == service.lower():

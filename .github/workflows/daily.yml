@@ -2,7 +2,7 @@ name: ChukChum Auto Publish
 
 on:
   schedule:
-    - cron: "25 */6 * * *"
+    - cron: "20 6 * * *"
   workflow_dispatch:
 
 permissions:
@@ -53,6 +53,8 @@ jobs:
         env:
           BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
           ENABLED_SERVICES: facebook
+          MAX_QUEUE_PER_CHANNEL: "8"
+          MAX_POSTS_PER_RUN: "1"
           MEDIA_REPO: JackPro2121/chukchum-media
         run: python src/pipeline_v2.py
 
