@@ -2,7 +2,7 @@ name: ChukChum Auto Publish
 
 on:
   schedule:
-    - cron: "20 6 * * *"
+    - cron: "7 */2 * * *"
   workflow_dispatch:
 
 permissions:
@@ -47,9 +47,9 @@ jobs:
           OLLAMA_MODEL: gemma4:31b
           BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
           ENABLED_SERVICES: facebook
-          MAX_QUEUE_PER_CHANNEL: "8"
+          MAX_QUEUE_PER_CHANNEL: "5"
           MAX_POSTS_PER_RUN: "1"
-          FETCH_ONLY_IF_QUEUE_EMPTY: "true"
+          FETCH_ONLY_IF_QUEUE_EMPTY: "false"
           MEDIA_REPO: JackPro2121/chukchum-media
         run: python src/run_daily.py
 
