@@ -30,7 +30,7 @@ pipeline.py -> downloader (yt-dlp) -> enhancer (ffmpeg)
 | `search.py` / `lookup.py` | YT/IG/X/FB keyword search via Apify |
 | `creators_state.py` | eligible creator selector |
 | `downloader.py` | latest video URL + download (yt-dlp) |
-| `enhancer.py` | ffmpeg: crop, scale 1080x1920, setsar, trim, faststart |
+| `enhancer.py` | ffmpeg: 9:16 crop/scale, color and sharpness correction, subtitles-ready safe layout, loudness-normalized audio, subtle brand watermark, faststart |
 | `media_repo.py` | commit video to `chukchum-media`, return public raw URL |
 | `buffer_client.py` | Buffer GraphQL: channels, createPost |
 | `pipeline_v2.py` | orchestrator for the target list (CLI entry) |

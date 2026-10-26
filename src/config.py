@@ -24,6 +24,7 @@ R2_BUCKET = os.environ.get("R2_BUCKET", "")
 R2_PUBLIC_BASE = os.environ.get("R2_PUBLIC_BASE", "").rstrip("/")
 
 BRAND = os.environ.get("BRAND", "ChukChum")
+WATERMARK_FONT = os.environ.get("WATERMARK_FONT", "")
 
 OLLAMA_API_KEY = os.environ.get("OLLAMA_API_KEY", "")
 OLLAMA_API = os.environ.get("OLLAMA_API") or "https://ollama.com"
