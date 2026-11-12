@@ -7,7 +7,14 @@ from pathlib import Path
 
 from apify_client import run_actor
 import storage
-from config import OLLAMA_API_KEY, OLLAMA_API, OLLAMA_MODEL
+from config import (
+    GROQ_API,
+    GROQ_API_KEY,
+    GROQ_MODEL,
+    OLLAMA_API,
+    OLLAMA_API_KEY,
+    OLLAMA_MODEL,
+)
 
 if hasattr(sys.stdout, "reconfigure"):
     try:
@@ -52,9 +59,63 @@ def pick_next_unprocessed(username: str, category: str) -> dict | None:
     return None
 
 
+def _call_groq(prompt: str) -> str:
+    """Call Groq OpenAI-compatible chat completions endpoint."""
+    body: dict = {
+        "model": GROQ_MODEL,
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": 0.7,
+        "max_completion_tokens": 400,
+    }
+    model_lower = GROQ_MODEL.lower()
+    if "qwen" in model_lower:
+        body["reasoning_effort"] = "none"
+    elif "gpt-oss" in model_lower:
+        body["reasoning_effort"] = "low"
+        body["max_completion_tokens"] = 600
+
+    r = requests.post(
+        f"{GROQ_API.rstrip('/')}/chat/completions",
+        headers={"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"},
+        json=body,
+        timeout=60,
+    )
+    r.raise_for_status()
+    text = (r.json()["choices"][0]["message"].get("content") or "").strip()
+    if not text:
+        raise RuntimeError(f"Groq returned empty content for model {GROQ_MODEL}")
+    return text
+
+
+def _call_ollama(prompt: str) -> str:
+    """Call Ollama Cloud chat endpoint."""
+    body = {
+        "model": OLLAMA_MODEL,
+        "messages": [{"role": "user", "content": prompt}],
+        "stream": False,
+    }
+    r = requests.post(
+        f"{OLLAMA_API.rstrip('/')}/api/chat",
+        headers={"Authorization": f"Bearer {OLLAMA_API_KEY}", "Content-Type": "application/json"},
+        json=body,
+        timeout=90,
+    )
+    r.raise_for_status()
+    text = (r.json()["message"].get("content") or "").strip()
+    if not text:
+        raise RuntimeError(f"Ollama returned empty content for model {OLLAMA_MODEL}")
+    return text
+
+
 def generate_fb_caption(caption: str, category: str, title_hint: str = "") -> str:
-    if not OLLAMA_API_KEY:
-        raise RuntimeError("OLLAMA_API_KEY missing. Set it in .env or GitHub secrets.")
+    providers = []
+    if GROQ_API_KEY:
+        providers.append(("groq", _call_groq))
+    if OLLAMA_API_KEY:
+        providers.append(("ollama", _call_ollama))
+    if not providers:
+        raise RuntimeError("Neither GROQ_API_KEY nor OLLAMA_API_KEY is set. Configure one in .env or GitHub secrets.")
+
     prompt = (
         "You are a viral Facebook Reels content creator. Read the source caption of a reel and write a "
         "fresh Facebook caption: 1 short hook line + 1 line of context + 3 to 5 hashtags. "
@@ -63,19 +124,14 @@ def generate_fb_caption(caption: str, category: str, title_hint: str = "") -> st
         f"Source caption:\n{caption}\n\n"
         "Return ONLY the final caption text."
     )
-    body = {
-        "model": OLLAMA_MODEL,
-        "messages": [{"role": "user", "content": prompt}],
-        "stream": False,
-    }
-    r = requests.post(
-        f"{OLLAMA_API}/api/chat",
-        headers={"Authorization": f"Bearer {OLLAMA_API_KEY}", "Content-Type": "application/json"},
-        json=body,
-        timeout=90,
-    )
-    r.raise_for_status()
-    return r.json()["message"]["content"].strip()
+    last_err: Exception | None = None
+    for name, fn in providers:
+        try:
+            return fn(prompt)
+        except Exception as e:
+            print(f"  [warn] caption provider '{name}' failed: {e}")
+            last_err = e
+    raise last_err  # type: ignore[misc]
 
 
 def curl_download(url: str, out: str):

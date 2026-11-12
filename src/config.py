@@ -30,6 +30,10 @@ OLLAMA_API_KEY = os.environ.get("OLLAMA_API_KEY", "")
 OLLAMA_API = os.environ.get("OLLAMA_API") or "https://ollama.com"
 OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL") or "gemma4:31b"
 
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
+GROQ_API = os.environ.get("GROQ_API") or "https://api.groq.com/openai/v1"
+GROQ_MODEL = os.environ.get("GROQ_MODEL") or "qwen/qwen3.8-27b"
+
 MEDIA_REPO_DIR = os.environ.get("MEDIA_REPO_DIR") or str(ROOT.parent / "chukchum-media")
 MEDIA_REPO = os.environ.get("MEDIA_REPO") or "JackPro2121/chukchum-media"
 ENABLED_SERVICES = [s.strip() for s in os.environ.get("ENABLED_SERVICES", "").split(",") if s.strip()]
