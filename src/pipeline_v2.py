@@ -40,7 +40,7 @@ def run():
             print("  already posted, skip")
             continue
         source_file = r["video_file"]
-        enhanced = enhancer.enhance(source_file)
+        enhanced = enhancer.enhance(source_file, hook_text=r.get("hook_text", ""))
         try:
             public_url = media_repo.add(enhanced)
         except Exception as e:
